@@ -204,6 +204,8 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     public DefaultMQProducer(final String namespace, final String producerGroup, RPCHook rpcHook) {
         this.namespace = namespace;
         this.producerGroup = producerGroup;
+
+        // 内部维护了一个DefaultMQProducerImpl对象
         defaultMQProducerImpl = new DefaultMQProducerImpl(this, rpcHook);
     }
 
@@ -270,6 +272,9 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     }
     
     /**
+     * 启动producer实例
+     *
+     *
      * Start this producer instance. </p>
      *
      * <strong> Much internal initializing procedures are carried out to make this instance prepared, thus, it's a must
