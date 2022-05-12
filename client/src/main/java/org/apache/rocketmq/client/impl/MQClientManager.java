@@ -44,13 +44,22 @@ public class MQClientManager {
         return getOrCreateMQClientInstance(clientConfig, null);
     }
 
+    /**
+     * 获取 或  创建  客户端实例
+     *
+     * @param clientConfig
+     * @param rpcHook
+     * @return
+     */
     public MQClientInstance getOrCreateMQClientInstance(final ClientConfig clientConfig, RPCHook rpcHook) {
+        // 构建客户端id  getClientIP()@this.getInstanceName(){@unitName}
         String clientId = clientConfig.buildMQClientId();
+
+        // 尝试从缓存中获取实例
         MQClientInstance instance = this.factoryTable.get(clientId);
+        // 如果实例为空，新创建一个实例并且放入缓存
         if (null == instance) {
-            instance =
-                new MQClientInstance(clientConfig.cloneClientConfig(),
-                    this.factoryIndexGenerator.getAndIncrement(), clientId, rpcHook);
+            instance = new MQClientInstance(clientConfig.cloneClientConfig(), this.factoryIndexGenerator.getAndIncrement(), clientId, rpcHook);
             MQClientInstance prev = this.factoryTable.putIfAbsent(clientId, instance);
             if (prev != null) {
                 instance = prev;

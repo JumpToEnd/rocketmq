@@ -565,10 +565,20 @@ public abstract class NettyRemotingAbstract {
         }
     }
 
+    /**
+     * Netty 事件执行器
+     */
     class NettyEventExecutor extends ServiceThread {
+        /**
+         * Netty 事件队列
+         */
         private final LinkedBlockingQueue<NettyEvent> eventQueue = new LinkedBlockingQueue<NettyEvent>();
         private final int maxSize = 10000;
 
+        /**
+         * 增加Netty事件
+         * @param event
+         */
         public void putNettyEvent(final NettyEvent event) {
             int currentSize = this.eventQueue.size();
             if (currentSize <= maxSize) {
@@ -582,11 +592,15 @@ public abstract class NettyRemotingAbstract {
         public void run() {
             log.info(this.getServiceName() + " service started");
 
+            // 获取监听器
             final ChannelEventListener listener = NettyRemotingAbstract.this.getChannelEventListener();
 
+            // 死循环
             while (!this.isStopped()) {
                 try {
+                    // 从队列中取一个NettyEvent
                     NettyEvent event = this.eventQueue.poll(3000, TimeUnit.MILLISECONDS);
+                    // 如果事件不为空，监听器也不为空 那就开始处理吧
                     if (event != null && listener != null) {
                         switch (event.getType()) {
                             case IDLE:
