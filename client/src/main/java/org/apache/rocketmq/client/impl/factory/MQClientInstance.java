@@ -250,12 +250,16 @@ public class MQClientInstance {
                 case CREATE_JUST:
                     this.serviceState = ServiceState.START_FAILED;
                     // If not specified,looking address from name server
+                    // 如果没有指定NameServer，拉取一次
                     if (null == this.clientConfig.getNamesrvAddr()) {
                         this.mQClientAPIImpl.fetchNameServerAddr();
                     }
+
                     // Start request-response channel
+                    // 启动请求响应通道
                     this.mQClientAPIImpl.start();
                     // Start various schedule tasks
+                    // 启动一系列定时任务
                     this.startScheduledTask();
                     // Start pull service
                     this.pullMessageService.start();
@@ -274,7 +278,21 @@ public class MQClientInstance {
         }
     }
 
+    /**
+     * 启动一系列定时任务
+     *
+     */
     private void startScheduledTask() {
+
+        /*
+         * 如果配置的 nameServer 地址为空
+         *
+         * 10s 后， 每隔120s拉取一次 NameServer信息
+         *
+         *
+         *
+         * scheduleAtFixedRate() => initialDelay后 每隔 period 执行一次
+         */
         if (null == this.clientConfig.getNamesrvAddr()) {
             this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
@@ -289,6 +307,13 @@ public class MQClientInstance {
             }, 1000 * 10, 1000 * 60 * 2, TimeUnit.MILLISECONDS);
         }
 
+        /*
+         * 从NameServer 更新 Topic 路由信息
+         *
+         * 10ms 后，每隔 3s 执行一次
+         *
+         * this.clientConfig.getPollNameServerInterval() => 默认值 1000 * 30
+         */
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -301,6 +326,14 @@ public class MQClientInstance {
             }
         }, 10, this.clientConfig.getPollNameServerInterval(), TimeUnit.MILLISECONDS);
 
+        /*
+         * 清理不在线的 Broker
+         * 向Broker发送心跳
+         *
+         * 1s 后， 每隔 3s 执行一次
+         *
+         * this.clientConfig.getHeartbeatBrokerInterval() => 默认值 1000 * 30
+         */
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -314,6 +347,13 @@ public class MQClientInstance {
             }
         }, 1000, this.clientConfig.getHeartbeatBrokerInterval(), TimeUnit.MILLISECONDS);
 
+        /*
+         * 持久化所有的消费偏移量
+         *
+         * 1s 后，每隔 5s 执行一次
+         *
+         * this.clientConfig.getPersistConsumerOffsetInterval() => 默认值 1000 * 5
+         */
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -326,6 +366,12 @@ public class MQClientInstance {
             }
         }, 1000 * 10, this.clientConfig.getPersistConsumerOffsetInterval(), TimeUnit.MILLISECONDS);
 
+        /*
+         *
+         * 调整线程池
+         *
+         * 1min 后，每隔 1min 执行
+         */
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override

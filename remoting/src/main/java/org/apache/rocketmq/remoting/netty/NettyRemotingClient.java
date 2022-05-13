@@ -72,6 +72,8 @@ import org.apache.rocketmq.remoting.protocol.RemotingCommand;
 /**
  * Netty 远程客户端
  *
+ * 封装了Netty
+ *
  */
 public class NettyRemotingClient extends NettyRemotingAbstract implements RemotingClient {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(RemotingHelper.ROCKETMQ_REMOTING);

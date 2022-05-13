@@ -168,6 +168,9 @@ import org.apache.rocketmq.remoting.protocol.RemotingCommand;
 import org.apache.rocketmq.remoting.protocol.RemotingSerializable;
 import com.alibaba.fastjson.JSON;
 
+/**
+ *
+ */
 public class MQClientAPIImpl {
 
     private final static InternalLogger log = ClientLogger.getLog();
@@ -178,6 +181,9 @@ public class MQClientAPIImpl {
         System.setProperty(RemotingCommand.REMOTING_VERSION_KEY, Integer.toString(MQVersion.CURRENT_VERSION));
     }
 
+    /**
+     * 远程客户端
+     */
     private final RemotingClient remotingClient;
     private final TopAddressing topAddressing;
     private final ClientRemotingProcessor clientRemotingProcessor;
@@ -230,6 +236,11 @@ public class MQClientAPIImpl {
         return remotingClient;
     }
 
+    /**
+     * 拉取NameServer地址
+     *
+     * @return
+     */
     public String fetchNameServerAddr() {
         try {
             String addrs = this.topAddressing.fetchNSAddr();
@@ -253,6 +264,9 @@ public class MQClientAPIImpl {
         this.remotingClient.updateNameServerAddressList(list);
     }
 
+    /**
+     * 启动远程客户端
+     */
     public void start() {
         this.remotingClient.start();
     }

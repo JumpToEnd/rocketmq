@@ -121,6 +121,7 @@
         <module>logging</module>
         <module>acl</module>
         <module>example</module>
+        <module>debug</module>
     </modules>
 
     <build>
